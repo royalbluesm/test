@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion Pink Gradient Clock</title>
+    <title>Notion Pink Diamond Clock</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
-            /* 노션 핑크 스타일 그라데이션 정의 */
-            --pink-gradient: linear-gradient(135deg, #ff5e8e 0%, #ff9aa2 100%);
-            --text-color: #37352f;
+            /* 요청하신 노션 핑크(#C14C8A)에서 연해지는 그라데이션 */
+            --pink-gradient: linear-gradient(135deg, #C14C8A 0%, #F0A3C4 100%);
         }
 
         body {
@@ -31,26 +30,25 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            /* 테두리도 아주 연한 핑크색으로 변경 */
-            border: 2px solid rgba(255, 94, 142, 0.1); 
+            /* 테두리도 그라데이션 색상 중 하나로 연하게 */
+            border: 2px solid rgba(193, 76, 138, 0.15);
             position: relative;
             margin-bottom: 30px;
         }
 
-        /* 중앙 점 제거 혹은 아주 작게 유지 (디자인상 원들이 회전하는 중심축) */
+        /* 중앙 축 (작게 유지) */
         .center-dot {
             position: absolute;
             top: 50%;
             left: 50%;
             width: 4px;
             height: 4px;
-            background-color: rgba(255, 94, 142, 0.3);
+            background-color: #C14C8A;
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            z-index: 10;
         }
 
-        /* 바늘 컨테이너 (투명) */
+        /* 바늘 컨테이너 (회전축 역할, 투명) */
         .hand-container {
             position: absolute;
             top: 50%;
@@ -59,35 +57,48 @@
             height: 0;
         }
 
-        /* 바늘 끝 원형 팁 - 그라데이션 적용 및 그림자 제거 */
-        .tip-circle {
+        /* === 다이아몬드 팁 공통 스타일 === */
+        .sparkle-diamond {
             position: absolute;
             background: var(--pink-gradient);
-            border-radius: 50%;
+            /* 다이아몬드 모양 만들기 */
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
             transform: translate(-50%, -50%);
-            box-shadow: none; /* 그림자 제거 */
+            /* 반짝이는 느낌을 위한 미세한 밝기 조정 애니메이션 (선택사항) */
+            /* animation: sparkle 2s infinite alternate; */
+        }
+        
+        /* 시침 다이아몬드 (제일 크고 안쪽) */
+        .hour-diamond {
+            width: 28px;
+            height: 28px;
+            top: -50px;
         }
 
-        /* 시침 원 (더 크고 안쪽) */
-        .hour-circle {
-            width: 26px;
-            height: 26px;
-            top: -55px;
+        /* 분침 다이아몬드 (중간 크기) */
+        .minute-diamond {
+            width: 20px;
+            height: 20px;
+            top: -80px;
+        }
+        
+        /* 초침 다이아몬드 (제일 작고 바깥쪽) */
+        .second-hand-container {
+            z-index: 10; /* 가장 위에 표시 */
+        }
+        .second-diamond {
+            width: 14px;
+            height: 14px;
+            top: -95px; /* 가장 멀리 */
         }
 
-        /* 분침 원 (더 작고 바깥쪽) */
-        .minute-circle {
-            width: 16px;
-            height: 16px;
-            top: -85px;
-        }
 
         /* === 디지털 시계 영역 === */
         .digital-clock {
             font-size: 1.8rem;
-            font-weight: 800; /* 더 굵게 설정 */
+            font-weight: 800;
             letter-spacing: -1px;
-            /* 텍스트에 그라데이션 적용 */
+            /* 텍스트 그라데이션 적용 */
             background: var(--pink-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -98,51 +109,4 @@
 </head>
 <body>
 
-    <div class="analog-clock">
-        <div class="center-dot"></div>
-        
-        <div class="hand-container" id="hour-hand">
-            <div class="tip-circle hour-circle"></div>
-        </div>
-        
-        <div class="hand-container" id="minute-hand">
-            <div class="tip-circle minute-circle"></div>
-        </div>
-    </div>
-
-    <div class="digital-clock" id="digital-display">
-        00:00 AM
-    </div>
-
-    <script>
-        const hourHand = document.getElementById('hour-hand');
-        const minuteHand = document.getElementById('minute-hand');
-        const digitalDisplay = document.getElementById('digital-display');
-
-        function updateClock() {
-            const now = new Date();
-            const hours24 = now.getHours();
-            const minutes = now.getMinutes();
-            const seconds = now.getSeconds();
-
-            // 아날로그 바늘 계산
-            const minuteDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
-            const hourDeg = ((hours24 % 12) / 12) * 360 + (minutes / 60) * 30;
-
-            hourHand.style.transform = `rotate(${hourDeg}deg)`;
-            minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
-
-            // 디지털 시간 계산 (12시간제)
-            let hours12 = hours24 % 12;
-            hours12 = hours12 ? hours12 : 12;
-            const ampm = hours24 >= 12 ? 'PM' : 'AM';
-            const paddedMinutes = minutes.toString().padStart(2, '0');
-
-            digitalDisplay.innerText = `${hours12}:${paddedMinutes} ${ampm}`;
-        }
-
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
-</body>
-</html>
+    <div class="analog-clock

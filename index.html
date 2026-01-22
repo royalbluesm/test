@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Notion Clock</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* 전체 컨테이너 및 공통 스타일 */
+        body {
+            margin: 0;
+            padding: 20px; /* 노션 임베드 여백 고려 */
+            background-color: transparent; /* 배경 투명 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            /* 요청하신 대략적인 사이즈 영역 내에서 중앙 정렬되도록 설정 */
+            max-width: 300px;
+            max-height: 400px;
+            box-sizing: border-box;
+        }
+
+        /* === 아날로그 시계 스타일 === */
+        .analog-clock {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid rgba(55, 53, 47, 0.2); /* 노션 기본 텍스트 색상의 연한 테두리 */
+            position: relative;
+            margin-bottom: 20px; /* 디지털 시계와의 간격 */
+            /* 시계 내부 그림자 (선택사항 - 입체감) */
+            /* box-shadow: inset 0 0 10px rgba(0,0,0,0.05); */
+        }
+
+        /* 중앙 점 (선택사항) */
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: #37352f;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* 바늘 컨테이너 (바늘 자체는 투명하고 회전축 역할만 함) */
+        .hand-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            /* 너비/높이 0으로 설정하여 바늘 몸통을 안 보이게 함 */
+            width: 0;
+            height: 0;
+        }
+
+        /* 바늘 끝의 원형 팁 공통 스타일 */
+        .tip-circle {
+            position: absolute;
+            background-color: #37352f; /* 노션 기본 텍스트 색상 */
+            border-radius: 50%;
+            /* 원의 중심을 바늘 축에 맞추기 위한 이동 */
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 살짝 그림자 */
+        }
+
+        /* -- 시침 스타일 -- */
+        .hour-hand-container {
+            z-index: 5; /* 분침보다 아래 */
+        }
+        .hour-circle {
+            width: 22px;  /* 원이 좀 더 큼 */
+            height: 22px;
+            top: -60px;   /* 중심으로부터의 거리 (짧음) */
+        }
+
+        /* -- 분침 스타일 -- */
+        .minute-hand-container {
+            z-index: 6; /* 시침보다 위 */
+        }
+        .minute-circle {
+            width: 14px;  /* 원이 좀 더 작음 */
+            height: 14px;
+            top: -85px;   /* 중심으로부터의 거리 (김) */
+        }
+
+
+        /* === 디지털 시계 스타일 === */
+        .digital-clock {
+            font-size: 1.5rem; /* 크기 작게 설정 */
+            font-weight: 600;
+            color: #37352f;
+            letter-spacing: -0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="analog-clock">
+        <div class="center-dot"></div>
+        
+        <div class="hand-container hour-hand-container" id="hour-hand">
+            <div class="tip-circle hour-circle"></div>
+        </div>
+        
+        <div class="hand-container minute-hand-container" id="minute-hand">
+            <div class="tip-circle minute-circle"></div>
+        </div>
+    </div>
+
+    <div class="digital-clock" id="digital-display">
+        Loading...
+    </div>
+
+
+    <script>
+        const hourHand = document.getElementById('hour-hand');
+        const minuteHand = document.getElementById('minute-hand');
+        const digitalDisplay = document.getElementById('digital-display');
+
+        function updateClock() {
+            const now = new Date();
+            
+            const hours24 = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            // === 아날로그 시계 각도 계산 ===
+            // 분침 각도: (분 / 60) * 360도 + (초 / 60) * 6도 (부드러운 움직임)
+            const minuteDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
+            // 시침 각도: (시 / 12) * 360도 + (분 / 60) * 30도 (분이 지날수록 시침도 조금씩 이동)
+            const hourDeg = ((hours24 % 12) / 12) * 360 + (minutes / 60) * 30;
+
+            hourHand.style.transform = `rotate(${hourDeg}deg)`;
+            minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+
+            // === 디지털 시계 포맷팅 (12시간제, 초 없음) ===
+            let hours12 = hours24 % 12;
+            hours12 = hours12 ? hours12 : 12; // 0시는 12시로 표시
+            const ampm = hours24 >= 12 ? 'PM' : 'AM';
+            // 분이 한 자리일 때 앞에 0 붙이기 (예: 5분 -> 05분)
+            const paddedMinutes = minutes.toString().padStart(2, '0');
+
+            digitalDisplay.innerText = `${hours12}:${paddedMinutes} ${ampm}`;
+        }
+
+        // 1초마다 시계 업데이트 (초침은 없지만 아날로그 바늘의 부드러운 이동을 위해 필요)
+        setInterval(updateClock, 1000);
+        updateClock(); // 페이지 로드 시 즉시 실행
+    </script>
+
+</body>
+</html>

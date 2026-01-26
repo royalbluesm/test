@@ -3,168 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion Solid Pink Sparkle Clock</title>
+    <title>Notion Galaxy Style Clock</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-        :root {
-            /* 요청하신 단색 컬러 정의 */
-            --solid-pink: #C14C8A;
-        }
-
         body {
             margin: 0;
             padding: 0;
             background-color: transparent;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            font-family: 'Pretendard Variable', Pretendard, sans-serif;
+            align-items: center;
             width: 300px;
             height: 400px;
             overflow: hidden;
+            font-family: 'Pretendard Variable', Pretendard, sans-serif;
         }
 
-        /* === 아날로그 시계 영역 === */
-        .analog-clock {
-            width: 200px;
-            height: 200px;
+        .clock-bg {
+            width: 280px;
+            height: 280px;
+            background-color: #C14C8A;
             border-radius: 50%;
-            /* 테두리는 메인 컬러의 연한 버전으로 설정 */
-            border: 2px solid rgba(193, 76, 138, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            margin-bottom: 30px;
-            box-sizing: border-box;
         }
 
-        /* 중앙 축 */
-        .center-dot {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 8px;
-            height: 8px;
-            background-color: var(--solid-pink);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 15;
+        .time-container {
+            display: flex;
+            flex-direction: column;
+            line-height: 0.85; 
+            font-style: italic; 
+            font-weight: 900; 
+            text-align: center;
         }
 
-        /* === 일반 막대형 바늘 공통 스타일 === */
-        .hand-line {
-            position: absolute;
-            bottom: 50%; /* 중앙에서 시작 */
-            left: 50%;
-            background-color: var(--solid-pink);
-            transform-origin: bottom center; /* 회전 축을 하단 중앙으로 설정 */
-            border-radius: 4px; /* 끝부분 둥글게 */
-            z-index: 10;
+        .hour {
+            font-size: 110px;
+            color: #FFFFFF; 
         }
 
-        /* 시침 (짧고 굵게) */
-        #hour-hand {
-            width: 6px;
-            height: 60px; /* 길이 조절 */
-            margin-left: -3px; /* 중앙 정렬을 위해 너비의 절반만큼 이동 */
+        .minute {
+            font-size: 110px;
+            color: #FDEFF4; 
         }
 
-        /* 분침 (길고 얇게) */
-        #minute-hand {
-            width: 4px;
-            height: 85px; /* 길이 조절 */
-            margin-left: -2px;
-        }
-
-        /* === 반짝이 초침 영역 === */
-        /* 초침 컨테이너 (회전축 역할, 투명) */
-        .second-hand-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            z-index: 20;
-        }
-
-        /* 반짝이(✨) 모양 구현 */
-        .sparkle-shape {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: var(--solid-pink);
-            top: -95px; /* 중심으로부터의 거리 */
-            left: -10px; /* 너비의 절반만큼 이동하여 중앙 정렬 */
-            /* 8개의 점을 이용해 안쪽으로 파인 별 모양 구현 */
-            clip-path: polygon(50% 0%, 61% 35%, 100% 50%, 61% 65%, 50% 100%, 39% 65%, 0% 50%, 39% 35%);
-            /* 부드럽게 빛나는 효과 (선택사항) */
-            filter: drop-shadow(0 0 2px rgba(193, 76, 138, 0.5));
-        }
-
-
-        /* === 디지털 시계 영역 === */
-        .digital-clock {
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            /* 단색 적용 */
-            color: var(--solid-pink);
-        }
     </style>
 </head>
 <body>
 
-    <div class="analog-clock">
-        <div class="center-dot"></div>
-        
-        <div class="hand-line" id="hour-hand"></div>
-        
-        <div class="hand-line" id="minute-hand"></div>
-        
-        <div class="second-hand-container" id="second-hand-wrapper">
-            <div class="sparkle-shape"></div>
+    <div class="clock-bg">
+        <div class="time-container">
+            <div class="hour" id="hour">10</div>
+            <div class="minute" id="minute">08</div>
         </div>
     </div>
 
-    <div class="digital-clock" id="digital-display">
-        00:00 AM
-    </div>
-
     <script>
-        const hourHand = document.getElementById('hour-hand');
-        const minuteHand = document.getElementById('minute-hand');
-        // 초침은 회전하는 컨테이너를 선택
-        const secondHandWrapper = document.getElementById('second-hand-wrapper');
-        const digitalDisplay = document.getElementById('digital-display');
-
         function updateClock() {
             const now = new Date();
-            const hours24 = now.getHours();
-            const minutes = now.getMinutes();
-            const seconds = now.getSeconds();
-            const millis = now.getMilliseconds();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const paddedHours = hours.toString().padStart(2, '0');
 
-            // 각도 계산
-            // 초침을 더 부드럽게 하려면 아래 주석 해제 (현재는 1초 단위로 딱딱 끊김)
-            // const secondDeg = ((seconds / 60) * 360) + ((millis/1000)*6); 
-            const secondDeg = (seconds / 60) * 360;
-            const minuteDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
-            const hourDeg = ((hours24 % 12) / 12) * 360 + (minutes / 60) * 30;
-
-            // 회전 적용
-            secondHandWrapper.style.transform = `rotate(${secondDeg}deg)`;
-            minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
-            hourHand.style.transform = `rotate(${hourDeg}deg)`;
-
-            // 디지털 시계 표시
-            let hours12 = hours24 % 12;
-            hours12 = hours12 ? hours12 : 12;
-            const ampm = hours24 >= 12 ? 'PM' : 'AM';
-            const paddedMinutes = minutes.toString().padStart(2, '0');
-
-            digitalDisplay.innerText = `${hours12}:${paddedMinutes} ${ampm}`;
+            document.getElementById('hour').innerText = paddedHours;
+            document.getElementById('minute').innerText = minutes;
         }
 
-        // 부드러운 초침 움직임을 원하시면 인터벌을 줄이세요 (예: 50)
         setInterval(updateClock, 1000);
         updateClock();
     </script>

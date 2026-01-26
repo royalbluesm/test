@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion Galaxy Style Clock</title>
+    <title>Notion Galaxy Style Clock v2</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         body {
@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 300px;
+            width: 300px; /* 노션 임베드 기준 크기 */
             height: 400px;
             overflow: hidden;
             font-family: 'Pretendard Variable', Pretendard, sans-serif;
@@ -22,32 +22,39 @@
         .clock-bg {
             width: 280px;
             height: 280px;
-            background-color: #C14C8A;
+            /* 배경색 #C14C8A에 불투명도 0.6(60%) 적용 */
+            background-color: rgba(193, 76, 138, 0.6); 
             border-radius: 50%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
+            box-sizing: border-box;
         }
 
         .time-container {
             display: flex;
             flex-direction: column;
-            line-height: 0.85; 
-            font-style: italic; 
-            font-weight: 900; 
+            justify-content: center;
+            align-items: center;
+            line-height: 0.9; /* 숫자 사이 수직 간격 조절 */
+            font-weight: 900; /* 굵은 폰트 */
             text-align: center;
+            /* 정중앙 정렬을 위한 미세 조정 */
+            transform: translateY(-2px); 
         }
 
         .hour {
             font-size: 110px;
-            color: #FFFFFF; 
+            color: #FFFFFF; /* 시: 화이트 */
+            margin: 0;
+            padding: 0;
         }
 
         .minute {
             font-size: 110px;
-            color: #FDEFF4; 
+            color: #FDEFF4; /* 분: 연한 핑크 */
+            margin: 0;
+            padding: 0;
         }
 
     </style>
@@ -56,8 +63,8 @@
 
     <div class="clock-bg">
         <div class="time-container">
-            <div class="hour" id="hour">10</div>
-            <div class="minute" id="minute">08</div>
+            <div class="hour" id="hour">00</div>
+            <div class="minute" id="minute">00</div>
         </div>
     </div>
 
@@ -66,6 +73,8 @@
             const now = new Date();
             let hours = now.getHours();
             const minutes = now.getMinutes().toString().padStart(2, '0');
+
+            // 12시간제 설정
             hours = hours % 12;
             hours = hours ? hours : 12;
             const paddedHours = hours.toString().padStart(2, '0');
@@ -74,6 +83,7 @@
             document.getElementById('minute').innerText = minutes;
         }
 
+        // 1초마다 업데이트
         setInterval(updateClock, 1000);
         updateClock();
     </script>

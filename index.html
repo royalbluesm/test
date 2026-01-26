@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion Galaxy Style Clock v3</title>
+    <title>Notion Galaxy Style Clock v4</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         body {
@@ -25,20 +25,9 @@
             background-color: rgba(193, 76, 138, 0.8); 
             border-radius: 50%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box;
-        }
-
-        .date-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 800;
-            font-size: 16px;
-            color: #FFFFFF;
-            margin-bottom: 2px;
+            position: relative;
         }
 
         .time-container {
@@ -49,6 +38,7 @@
             line-height: 0.85; 
             font-weight: 1000;
             text-align: center;
+            z-index: 2;
         }
 
         .hour, .minute {
@@ -59,15 +49,22 @@
             letter-spacing: 0px;
         }
 
-        .hour {
+        .hour { color: #FFFFFF; }
+        .minute { color: #FDEFF4; }
+
+        .date-overlay {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            box-sizing: border-box;
+            font-weight: 800;
+            font-size: 14px;
             color: #FFFFFF;
-        }
-
-        .minute {
-            color: #FDEFF4;
-        }
-
-        .date-part {
+            z-index: 3;
+            pointer-events: none;
             font-variant-numeric: tabular-nums;
         }
     </style>
@@ -75,10 +72,9 @@
 <body>
 
     <div class="clock-bg">
-        <div class="date-container">
-            <span id="year" class="date-part">0000</span>
-            <span>/</span>
-            <span id="day" class="date-part">0000</span>
+        <div class="date-overlay">
+            <span id="year">0000</span>
+            <span id="day">0000</span>
         </div>
         <div class="time-container">
             <div class="hour" id="hour">00</div>
